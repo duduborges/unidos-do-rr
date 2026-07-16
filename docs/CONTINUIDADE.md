@@ -5,7 +5,7 @@ Este documento registra o contexto, as decisoes e o estado do projeto para que o
 ## Estado atual
 
 - Fase: descoberta e definicao do MVP.
-- Implementacao: ainda nao iniciada; aguardando revisao da especificacao escrita pelo usuario.
+- Implementacao: ainda nao iniciada; especificacao aprovada e plano tecnico pronto, aguardando escolha do modo de execucao.
 - Repositorio: projeto novo, sem estrutura de aplicacao e sem commits.
 - Ativos existentes na raiz:
   - `unidos-logo.png`: escudo oficial, 1254 x 1254 px.
@@ -146,7 +146,8 @@ No celular, o admin usa navegacao inferior com quatro areas. Durante uma partida
 - Modelo de dados, seguranca e funcionamento Realtime aprovados.
 - Organizacao do site publico, rotas administrativas e estados da interface aprovados.
 - Regras de integridade, testes e deploy aprovadas.
-- Especificacao consolidada em `docs/superpowers/specs/2026-07-16-unidos-do-rr-mvp-design.md`.
+- Especificacao consolidada e aprovada em `docs/superpowers/specs/2026-07-16-unidos-do-rr-mvp-design.md`.
+- Plano tecnico criado em `docs/superpowers/plans/2026-07-16-unidos-do-rr-mvp.md`.
 
 ## Limitacoes aceitas no MVP
 
