@@ -206,6 +206,8 @@ export type Database = {
           notes: string | null
           opponent_id: string
           scheduled_at: string
+          score_opponent: number | null
+          score_unidos: number | null
           started_at: string | null
           status: string
           updated_at: string
@@ -219,6 +221,8 @@ export type Database = {
           notes?: string | null
           opponent_id: string
           scheduled_at: string
+          score_opponent?: number | null
+          score_unidos?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -232,6 +236,8 @@ export type Database = {
           notes?: string | null
           opponent_id?: string
           scheduled_at?: string
+          score_opponent?: number | null
+          score_unidos?: number | null
           started_at?: string | null
           status?: string
           updated_at?: string
@@ -385,6 +391,8 @@ export type Database = {
           notes: string | null
           opponent_id: string
           scheduled_at: string
+          score_opponent: number | null
+          score_unidos: number | null
           started_at: string | null
           status: string
           updated_at: string
@@ -408,6 +416,8 @@ export type Database = {
           notes: string | null
           opponent_id: string
           scheduled_at: string
+          score_opponent: number | null
+          score_unidos: number | null
           started_at: string | null
           status: string
           updated_at: string
