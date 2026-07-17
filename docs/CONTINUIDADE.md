@@ -215,7 +215,16 @@ Nunca cadastrar `SUPABASE_SECRET_KEY`, `ADMIN_EMAIL` ou `ADMIN_PASSWORD` na Verc
 4. Definir as quatro variaveis do bootstrap e executar `pnpm admin:create` uma vez.
 5. Cadastrar apenas `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` na Vercel.
 6. Importar o repositorio na Vercel usando Node.js 22 e executar o deploy.
-7. No primeiro acesso, cadastrar atletas, adversarios e campos reais; os nomes usados nos testes locais nao fazem parte da migration.
+7. Revisar no primeiro acesso os atletas, adversarios, campos, partida e ajustes importados do banco local.
+
+### Estado do Supabase remoto em 2026-07-17
+
+- Projeto `xunnozbckcjwntgtgkix` vinculado ao Supabase CLI.
+- Migrations `202607160001_initial_schema.sql` e `20260717052749_import_local_data.sql` aplicadas.
+- Snapshot local importado: 1 configuracao do clube, 6 atletas, 4 adversarios, 2 campos, 1 partida, 11 eventos e 4 ajustes estatisticos.
+- Contagens remotas verificadas pela Data API usando a chave publicavel.
+- Auth e `app_admins` nao foram copiados; a conta administrativa remota ainda precisa ser criada com `pnpm admin:create` e uma `SUPABASE_SECRET_KEY` usada somente em terminal seguro.
+- O CLI 2.109.1 exibiu um aviso ao atualizar o cache experimental do `pg-delta` por ausencia do certificado temporario, mas as migrations foram aplicadas e verificadas normalmente.
 
 ### Limitacoes conhecidas para a proxima iteracao
 
