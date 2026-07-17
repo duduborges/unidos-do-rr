@@ -232,3 +232,26 @@ Nunca cadastrar `SUPABASE_SECRET_KEY`, `ADMIN_EMAIL` ou `ADMIN_PASSWORD` na Verc
 - Correcao de gol no MVP e feita removendo logicamente o evento e publicando o correto; edicao direta do mesmo evento pode ser adicionada depois.
 - Cadastros permitem criar e arquivar atletas; edicao completa e arquivamento de adversarios/campos ainda podem ser ampliados.
 - Nao ha contas individuais nem atribuicao de alteracoes por pessoa, conforme a decisao de conta compartilhada.
+
+## Redesign da experiencia de partidas - 2026-07-17
+
+Plano: `docs/superpowers/plans/2026-07-17-match-experience-redesign.md`.
+
+### Implementado nesta iteracao (Tasks 4 a 7)
+
+- Task 4 - Cadastro de jogos passados no admin: `HistoricalMatchEditor` e `HistoricalMatchEvents` em `src/features/admin/historical-match-editor.tsx`. O `MatchManager` ganhou controle segmentado `AGENDADA | JA REALIZADA` e botao `DETALHES` nas partidas encerradas, sem regressao de `INICIAR`/`CONSOLE`. O resultado consolidado e salvo com `status = finished`, `started_at`, `ended_at` (+60 min) e placar; autor e assistencia sao opcionais.
+- Task 5 - Pagina publica de detalhe: `MatchDetail` (`src/features/public-site/match-detail.tsx`) e rota `src/app/(site)/jogos/[id]/` com `page`, `loading` e `not-found`. A rota tipa `params` explicitamente para nao depender do codegen de rotas do Next. Timeline, aviso de placar parcialmente detalhado, estado vazio, navegacao anterior/proxima e CTA do Instagram.
+- Task 6 - Faixa da temporada e historico navegavel: `SeasonRecord` (4 celulas alinhadas, grade 2x2 no mobile) e `MatchHistory` (cada linha vira `Link` para `/jogos/[id]` com `aria-label` de placar).
+- Task 7 - Carrossel 2.5D e movimento: `KitCarousel` (Embla + Autoplay, palco com `perspective`, autoplay pausado sob `prefers-reduced-motion` via `useSyncExternalStore`) e `MotionReveal` (motion com `whileInView`, respeita reduced motion). Os quatro kits saem de `public/kits/`.
+
+### Validacao executada nesta iteracao
+
+- `pnpm test`: 6 arquivos e 20 testes aprovados (inclui dominio, editor historico, detalhe publico, `SeasonRecord` e `KitCarousel`).
+- `pnpm typecheck`, `pnpm lint` e `pnpm build`: aprovados.
+- Stubs de teste adicionados em `vitest.setup.ts` (`IntersectionObserver`, `ResizeObserver`, `matchMedia`) para o Embla e o reduced motion.
+
+### Pendencias do plano (Task 8) - AINDA NAO EXECUTADAS
+
+- **Migration remota nao aplicada**: `supabase/migrations/20260717173201_historical_match_scores.sql` existe e esta commitada, mas o banco remoto (`xunnozbckcjwntgtgkix`) ainda nao tem as colunas `score_unidos`/`score_opponent`. Por isso `/jogos/[id]` retorna erro contra o remoto (`column matches.score_unidos does not exist`). Aplicar com `supabase db push --linked` (revisar antes com `--dry-run`).
+- Teste E2E `tests/e2e/match-experience.spec.ts` ainda nao escrito.
+- Validacao visual em 390 px e 1440 px e smoke test remoto ainda pendentes.
