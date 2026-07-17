@@ -5,6 +5,7 @@ import { CalendarDays, Goal, MapPin, Plus, Radio, Shield, Trash2, UserPlus } fro
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
 import { formatMatchClock } from '@/features/matches/domain'
+import { HistoricalMatchEditor, HistoricalMatchEvents } from './historical-match-editor'
 
 type Player = Database['public']['Tables']['players']['Row']
 type Opponent = Database['public']['Tables']['opponents']['Row']
@@ -112,17 +113,34 @@ export function MatchManager({ onLive }: { onLive: () => void }) {
   const [matches, setMatches] = useState<Match[]>([])
   const [opponents, setOpponents] = useState<Opponent[]>([])
   const [fields, setFields] = useState<Field[]>([])
+  const [players, setPlayers] = useState<Player[]>([])
   const [message, setMessage] = useState('')
+  const [mode, setMode] = useState<'scheduled' | 'finished'>('scheduled')
+  const [detailId, setDetailId] = useState<string | null>(null)
+  const [detailEvents, setDetailEvents] = useState<MatchEvent[]>([])
   const load = useCallback(async () => {
-    const [m, o, f] = await Promise.all([
+    const [m, o, f, p] = await Promise.all([
       supabase.from('matches').select('*, opponents(name), fields(name)').order('scheduled_at', { ascending: false }),
       supabase.from('opponents').select('*').eq('is_active', true).order('name'),
       supabase.from('fields').select('*').eq('is_active', true).order('name'),
+      supabase.from('players').select('*').eq('is_active', true).order('shirt_number'),
     ])
-    if (m.error || o.error || f.error) setMessage(m.error?.message ?? o.error?.message ?? f.error?.message ?? '')
-    else { setMatches(m.data); setOpponents(o.data); setFields(f.data) }
+    if (m.error || o.error || f.error || p.error) setMessage(m.error?.message ?? o.error?.message ?? f.error?.message ?? p.error?.message ?? '')
+    else { setMatches(m.data); setOpponents(o.data); setFields(f.data); setPlayers(p.data) }
   }, [supabase])
   useEffect(() => { const id = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(id) }, [load])
+
+  const loadDetail = useCallback(async (matchId: string) => {
+    const { data, error } = await supabase.from('match_events').select('*').eq('match_id', matchId).order('minute_snapshot', { ascending: true })
+    if (error) setMessage(error.message)
+    else setDetailEvents(data)
+  }, [supabase])
+
+  async function openDetail(matchId: string) {
+    if (detailId === matchId) { setDetailId(null); return }
+    setDetailId(matchId)
+    await loadDetail(matchId)
+  }
 
   async function create(formData: FormData) {
     const scheduled = String(formData.get('scheduledAt') ?? '')
@@ -143,18 +161,26 @@ export function MatchManager({ onLive }: { onLive: () => void }) {
     if (!error) { await load(); onLive() }
   }
 
-  return <><ManagerHeading eyebrow="TEMPORADA 2026" title="PARTIDAS" text="Agende jogos, inicie o relógio e consulte o histórico." />
-    <form className="manager-form match-form" action={create}>
+  const detailMatch = detailId ? matches.find((match) => match.id === detailId) : null
+  const canRegister = Boolean(opponents.length && fields.length)
+
+  return <><ManagerHeading eyebrow="TEMPORADA 2026" title="PARTIDAS" text="Agende jogos, inicie o relógio e cadastre resultados passados." />
+    <div className="segmented" role="tablist" aria-label="Tipo de cadastro">
+      <button role="tab" aria-selected={mode === 'scheduled'} className={mode === 'scheduled' ? 'active' : ''} onClick={() => setMode('scheduled')}>AGENDADA</button>
+      <button role="tab" aria-selected={mode === 'finished'} className={mode === 'finished' ? 'active' : ''} onClick={() => setMode('finished')}>JÁ REALIZADA</button>
+    </div>
+    {mode === 'scheduled' ? <form className="manager-form match-form" action={create}>
       <label>Adversário<select name="opponentId" required><option value="">Selecione</option>{opponents.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label>Campo<select name="fieldId" required><option value="">Selecione</option>{fields.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label>Data e hora<input name="scheduledAt" type="datetime-local" required /></label>
       <label className="check-label"><input name="isHome" type="checkbox" defaultChecked /> Mandante</label>
       <label>Observações<input name="notes" maxLength={500} /></label>
-      <button disabled={!opponents.length || !fields.length}><CalendarDays /> CADASTRAR PARTIDA</button>
-    </form>
-    {!opponents.length || !fields.length ? <p className="manager-message">Cadastre ao menos um adversário e um campo primeiro.</p> : null}
+      <button disabled={!canRegister}><CalendarDays /> CADASTRAR PARTIDA</button>
+    </form> : <HistoricalMatchEditor opponents={opponents.map((item) => ({ id: item.id, name: item.name }))} fields={fields.map((item) => ({ id: item.id, name: item.name }))} onSuccess={load} />}
+    {!canRegister ? <p className="manager-message">Cadastre ao menos um adversário e um campo primeiro.</p> : null}
     <Message value={message} />
-    <div className="resource-table">{matches.map((match) => <div className={`resource-row ${match.status === 'live' ? 'live-row' : ''}`} key={match.id}><span>{match.status === 'live' ? '● AO VIVO' : match.status === 'finished' ? 'ENCERRADO' : 'AGENDADO'}</span><strong>{match.opponents?.name}</strong><small>{new Date(match.scheduled_at).toLocaleString('pt-BR')} · {match.fields?.name}</small>{match.status === 'scheduled' ? <button onClick={() => start(match.id)}>INICIAR</button> : match.status === 'live' ? <button onClick={onLive}>CONSOLE</button> : <b>FINAL</b>}</div>)}</div>
+    <div className="resource-table">{matches.map((match) => <div className={`resource-row ${match.status === 'live' ? 'live-row' : ''}`} key={match.id}><span>{match.status === 'live' ? '● AO VIVO' : match.status === 'finished' ? 'ENCERRADO' : 'AGENDADO'}</span><strong>{match.opponents?.name}</strong><small>{new Date(match.scheduled_at).toLocaleString('pt-BR')} · {match.fields?.name}</small>{match.status === 'scheduled' ? <button onClick={() => start(match.id)}>INICIAR</button> : match.status === 'live' ? <button onClick={onLive}>CONSOLE</button> : <button className={detailId === match.id ? 'active' : ''} onClick={() => openDetail(match.id)}>DETALHES</button>}</div>)}</div>
+    {detailMatch && detailMatch.score_unidos !== null && detailMatch.score_opponent !== null ? <section className="detail-panel"><div className="detail-panel-head"><h2>{detailMatch.opponents?.name} · {detailMatch.score_unidos} × {detailMatch.score_opponent}</h2><small>Detalhe os gols desta partida (opcional).</small></div><HistoricalMatchEvents match={{ id: detailMatch.id, scoreUnidos: detailMatch.score_unidos, scoreOpponent: detailMatch.score_opponent }} players={players} events={detailEvents} onChange={() => loadDetail(detailMatch.id)} /></section> : null}
   </>
 }
 
