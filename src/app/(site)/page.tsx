@@ -1,7 +1,5 @@
-import { getHomeData } from '@/features/public-site/queries'
+import { HomePage } from '@/features/public-site/home-page'
 
-export default async function Home() {
-  await getHomeData()
-
-  return <h1>Unidos do RR</h1>
+export default function Home() {
+  return <HomePage />
 }
