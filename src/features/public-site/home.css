@@ -14,3 +14,37 @@
 
 .institutional-hero{display:grid;justify-items:center;gap:16px}.institutional-hero h1{margin:0;font:800 70px/.9 var(--font-display)}.institutional-hero p{margin:0;color:#aeb7c2}.empty-band{margin:0;padding:38px 0;color:#7f8b96;border-top:1px solid #ffffff24}.result-e{color:#e1b74a;background:#d4a72c21}.login-error{margin:12px 0 0;color:#c81018;font-size:10px}
 @media(max-width:800px){.institutional-hero h1{font-size:44px}.institutional-hero img{width:120px;height:138px}}
+
+@layer components {
+.season-record{list-style:none;margin:0;padding:0 max(20px,calc((100vw - 1200px)/2));min-height:132px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#071626;border-bottom:1px solid var(--rr-border)}
+.season-record li{padding:26px 42px;display:grid;grid-template-rows:auto 1fr auto;align-content:center;gap:6px;border-right:1px solid var(--rr-border)}
+.season-record li:last-child{border-right:0}
+.season-record strong{font:800 48px/.9 var(--font-display)}
+.season-record small{font-size:9px;font-weight:900;color:#7f8b96}
+.season-record .win strong{color:#54c790}.season-record .draw strong{color:#d5a92d}.season-record .loss strong{color:#f35a60}
+
+.kit-carousel{margin-top:14px;display:grid;gap:22px}
+.kit-viewport{overflow:hidden;padding:20px 0;perspective:1200px}
+.kit-track{display:flex;align-items:center;touch-action:pan-y pinch-zoom}
+.kit-slide{flex:0 0 60%;min-width:0;display:grid;place-items:center;transition:transform .5s ease,opacity .5s ease;transform:rotateY(14deg) translateZ(-90px) scale(.82);opacity:.4}
+.kit-slide[data-active="true"]{transform:rotateY(0) translateZ(0) scale(1);opacity:1}
+.kit-slide img{width:100%;height:auto;max-height:460px;object-fit:contain;filter:drop-shadow(0 26px 30px #030b1499)}
+.kit-controls{display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:16px;max-width:520px;margin:0 auto;width:100%}
+.kit-arrow{width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--rr-border);background:#0b1d2d;color:#f7f7f4;border-radius:50%}
+.kit-arrow:hover{background:#c81018;border-color:#c81018}
+.kit-active{text-align:center;display:grid;gap:5px}
+.kit-active strong{font:800 26px var(--font-display)}
+.kit-active small{color:#8794a0;font-size:11px}
+.kit-dots{display:flex;justify-content:center;gap:9px}
+.kit-dots button{width:10px;height:10px;padding:0;border:0;border-radius:50%;background:#ffffff29}
+.kit-dots button.active{background:#c81018;width:26px;border-radius:5px}
+}
+@media(max-width:800px){
+.season-record{min-height:110px;padding:0 16px;grid-template-columns:1fr 1fr}
+.season-record li{padding:18px 18px;border-right:1px solid var(--rr-border)}
+.season-record li:nth-child(2n){border-right:0}
+.season-record li:nth-child(-n+2){border-bottom:1px solid var(--rr-border)}
+.season-record strong{font-size:35px}
+.kit-slide{flex:0 0 78%}
+.kit-slide img{max-height:340px}
+}

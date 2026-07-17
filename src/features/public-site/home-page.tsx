@@ -7,6 +7,10 @@ import { useEffect, useState } from 'react'
 import { formatMatchClock } from '@/features/matches/domain'
 import type { HomeData } from './demo-data'
 import { RealtimeRefresh } from './realtime-refresh'
+import { SeasonRecord } from './season-record'
+import { MatchHistory } from './match-history'
+import { KitCarousel } from './kit-carousel'
+import { MotionReveal } from './motion-reveal'
 import './home.css'
 
 function LiveClock({ startedAt }: { startedAt: string }) {
@@ -53,12 +57,7 @@ export function HomePage({ data }: { data: HomeData }) {
           <p>Fut7, amizade e a força do Red River em campo.</p>
         </div>}
       </section>
-      <section className="record-band" aria-label="Visao geral da temporada">
-        <div><span>VISÃO GERAL</span><strong>{matchCount}</strong><small>PARTIDAS</small></div>
-        <div className="record-item win"><strong>{data.record.wins}</strong><small>VITÓRIAS</small></div>
-        <div className="record-item draw"><strong>{data.record.draws}</strong><small>EMPATES</small></div>
-        <div className="record-item loss"><strong>{data.record.losses}</strong><small>DERROTAS</small></div>
-      </section>
+      <SeasonRecord played={matchCount} wins={data.record.wins} draws={data.record.draws} losses={data.record.losses} />
       <section className="about-band section-pad">
         <div className="section-inner about-grid">
           <div><span className="eyebrow">NOSSA HISTÓRIA</span><h2>UNIDOS PELO BAIRRO.</h2><p>{data.settings.about}</p></div>
@@ -67,12 +66,12 @@ export function HomePage({ data }: { data: HomeData }) {
       </section>
       <section className="matches-band section-pad" id="jogos">
         <div className="section-inner"><div className="section-title"><div><span className="eyebrow">TEMPORADA 2026</span><h2>ÚLTIMOS JOGOS</h2></div><Trophy /></div>
-          <div className="match-list">{data.matches.length ? data.matches.map((match) => <article className="match-row" key={match.id ?? (match.date + match.opponent)}><time>{match.date}</time><div><strong>UNIDOS DO RR</strong><small>{match.field}</small></div><div className="row-score"><b>{match.us}</b><span>×</span><b>{match.them}</b></div><strong className="opponent-name">{match.opponent}</strong><span className={'result result-' + match.result.toLowerCase()}>{match.result}</span></article>) : <p className="empty-band">As partidas encerradas aparecerão aqui.</p>}</div>
+          <MotionReveal><MatchHistory matches={data.matches} /></MotionReveal>
         </div>
       </section>
       <section className="roster-band section-pad" id="elenco"><div className="section-inner"><span className="eyebrow">QUEM DEFENDE O RR</span><h2>NOSSO ELENCO</h2>{data.players.length ? <div className="roster-grid">{data.players.map((player) => <article className="player-card" key={player.id}><span className="player-number">{String(player.number).padStart(2, '0')}</span><div className="player-avatar">{player.number}</div><div><small>{player.position}</small><h3>{player.nickname}</h3><p>{player.name}</p></div><dl><div><dt>GOLS</dt><dd>{player.goals}</dd></div><div><dt>ASSIST.</dt><dd>{player.assists}</dd></div></dl></article>)}</div> : <p className="empty-band">O elenco está sendo atualizado.</p>}</div></section>
       <section className="rivalry-band section-pad" id="classico"><div className="section-inner rivalry-grid"><div><span className="eyebrow red">NOSSO CLÁSSICO</span><h2>{data.rivalry.title}</h2><p>{data.rivalry.description}</p></div><div className="versus"><Image src="/brand/unidos-logo.png" alt="Unidos do RR" width={124} height={142} /><span>VS</span><div className="large-opponent"><Shield /><strong>{data.rivalry.opponent}</strong></div></div></div></section>
-      <section className="kits-band section-pad" id="uniformes"><div className="section-inner"><span className="eyebrow">MANTO DO RR</span><h2>NOSSOS UNIFORMES</h2><div className="kits-layout"><div className="kit-image"><Image src="/brand/unidos-kits.png" alt="Uniformes home e away do Unidos do RR para jogadores e goleiros" fill sizes="(max-width: 800px) 100vw, 65vw" /></div><div className="kit-legend"><div><i className="swatch navy" /><span><strong>JOGADOR · HOME</strong><small>Azul-marinho, vermelho e branco</small></span></div><div><i className="swatch white" /><span><strong>JOGADOR · AWAY</strong><small>Branco, azul-marinho e vermelho</small></span></div><div><i className="swatch yellow" /><span><strong>GOLEIRO · HOME</strong><small>Amarelo, azul-marinho e vermelho</small></span></div><div><i className="swatch purple" /><span><strong>GOLEIRO · AWAY</strong><small>Roxo, vermelho e branco</small></span></div></div></div></div></section>
+      <section className="kits-band section-pad" id="uniformes"><div className="section-inner"><span className="eyebrow">MANTO DO RR</span><h2>NOSSOS UNIFORMES</h2><KitCarousel /></div></section>
       <section className="friendly-band"><div><span className="eyebrow">AGENDA ABERTA</span><h2>QUER JOGAR<br />CONTRA O RR?</h2><p>Organize seu time e chama a gente na DM.</p></div><a href={data.settings.instagramUrl} target="_blank" rel="noreferrer"><Camera /> MARCAR AMISTOSO <ExternalLink size={18} /></a></section>
     </main>
     <footer><div className="brand-lockup"><Image src="/brand/unidos-logo.png" alt="" width={42} height={48} /><span><strong>UNIDOS DO RR</strong><small>UNIDOS PELO BAIRRO.</small></span></div><p>{data.settings.locality}</p><a href={data.settings.instagramUrl} target="_blank" rel="noreferrer"><Camera size={18} /> @UNIDOSDORR</a></footer>
