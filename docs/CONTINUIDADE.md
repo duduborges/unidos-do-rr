@@ -194,18 +194,18 @@ Frontend e Vercel:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 Bootstrap da conta unica, usado apenas no terminal/CI seguro:
 
 ```env
-SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_SECRET_KEY=
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
 ```
 
-Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no navegador ou em variavel com prefixo `NEXT_PUBLIC_`.
+Nunca cadastrar `SUPABASE_SECRET_KEY`, `ADMIN_EMAIL` ou `ADMIN_PASSWORD` na Vercel. A chave secreta serve apenas para criar a conta administrativa em um terminal seguro e nunca pode usar o prefixo `NEXT_PUBLIC_`.
 
 ### Publicacao
 
@@ -213,7 +213,7 @@ Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no navegador ou em variavel com prefixo 
 2. Vincular o projeto com `supabase link --project-ref <ref>`.
 3. Aplicar o schema com `supabase db push`.
 4. Definir as quatro variaveis do bootstrap e executar `pnpm admin:create` uma vez.
-5. Cadastrar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` na Vercel.
+5. Cadastrar apenas `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` na Vercel.
 6. Importar o repositorio na Vercel usando Node.js 22 e executar o deploy.
 7. No primeiro acesso, cadastrar atletas, adversarios e campos reais; os nomes usados nos testes locais nao fazem parte da migration.
 

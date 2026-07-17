@@ -5,8 +5,8 @@ import { getSupabaseEnv } from '@/lib/env'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
-  const { url, anonKey } = getSupabaseEnv()
-  const supabase = createServerClient<Database>(url, anonKey, {
+  const { url, publishableKey } = getSupabaseEnv()
+  const supabase = createServerClient<Database>(url, publishableKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {

@@ -1,15 +1,19 @@
-const requiredVariables = [
-  'NEXT_PUBLIC_SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'ADMIN_EMAIL',
-  'ADMIN_PASSWORD',
-]
+const secretKey =
+  process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY
+
+const requiredVariables = ['NEXT_PUBLIC_SUPABASE_URL', 'ADMIN_EMAIL', 'ADMIN_PASSWORD']
 
 for (const name of requiredVariables) {
   const value = process.env[name]
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new Error('Missing required environment variable: ' + name)
   }
+}
+
+if (typeof secretKey !== 'string' || secretKey.trim().length === 0) {
+  throw new Error(
+    'Missing required environment variable: SUPABASE_SECRET_KEY (or legacy SUPABASE_SERVICE_ROLE_KEY)',
+  )
 }
 
 const originalWarn = console.warn
@@ -24,11 +28,10 @@ try {
 
 const { createClient } = supabaseModule
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL.trim()
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY.trim()
 const email = process.env.ADMIN_EMAIL.trim()
 const password = process.env.ADMIN_PASSWORD
 
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
+const supabase = createClient(supabaseUrl, secretKey.trim(), {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
