@@ -1,4 +1,48 @@
-export const demoData = {
+export interface HomePlayer {
+  id: string
+  name: string
+  nickname: string
+  number: number
+  position: string
+  goals: number
+  assists: number
+}
+
+export interface HomeMatch {
+  id?: string
+  date: string
+  opponent: string
+  field: string
+  us: number
+  them: number
+  result: 'V' | 'E' | 'D'
+}
+
+export interface HomeData {
+  liveMatch: {
+    id: string
+    opponent: string
+    field: string
+    startedAt: string
+    score: { unidos: number; opponent: number }
+  } | null
+  record: { wins: number; draws: number; losses: number }
+  players: HomePlayer[]
+  matches: HomeMatch[]
+  settings: {
+    about: string
+    locality: string
+    instagramUrl: string
+    mapsUrl: string
+  }
+  rivalry: {
+    opponent: string
+    title: string
+    description: string
+  }
+}
+
+export const demoData: HomeData = {
   liveMatch: {
     id: 'demo-live',
     opponent: 'Muito Paia FC',
@@ -21,4 +65,23 @@ export const demoData = {
     { date: '28 JUN', opponent: 'Real Norte', field: 'Arena Norte', us: 5, them: 1, result: 'V' },
     { date: '21 JUN', opponent: 'Familia Fut7', field: 'Arena Rio Vermelho', us: 1, them: 2, result: 'D' },
   ],
-} as const
+  settings: {
+    about: 'Do Rio Vermelho para o campo. Somos um time de Fut7 criado entre amigos, movido pela comunidade e pela vontade de competir. Em cada partida levamos o orgulho do norte da ilha.',
+    locality: 'Rio Vermelho · Florianópolis, Santa Catarina',
+    instagramUrl: 'https://www.instagram.com/unidosdorr/',
+    mapsUrl: 'https://maps.google.com/?q=Rio+Vermelho+Florianopolis',
+  },
+  rivalry: {
+    opponent: 'Muito Paia FC',
+    title: 'Rivalidade do bairro',
+    description: 'Quando Unidos do RR e Muito Paia FC entram em campo, não existe amistoso. É o confronto que movimenta a resenha e decide quem manda no bairro.',
+  },
+}
+
+export const emptyHomeData: HomeData = {
+  ...demoData,
+  liveMatch: null,
+  record: { wins: 0, draws: 0, losses: 0 },
+  players: [],
+  matches: [],
+}

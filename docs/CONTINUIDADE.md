@@ -149,7 +149,77 @@ No celular, o admin usa navegacao inferior com quatro areas. Durante uma partida
 - Especificacao consolidada e aprovada em `docs/superpowers/specs/2026-07-16-unidos-do-rr-mvp-design.md`.
 - Plano tecnico criado em `docs/superpowers/plans/2026-07-16-unidos-do-rr-mvp.md`.
 
+### 2026-07-17
+
+- Fundacao Supabase implementada com schema, integridade, Realtime, Storage e tipos TypeScript gerados.
+- RLS e privilegios validados por 37 testes pgTAP; bootstrap administrativo validado localmente.
+
 ## Limitacoes aceitas no MVP
 
 - Como todos usarao a mesma conta administrativa, o sistema nao conseguira atribuir cada alteracao a uma pessoa diferente.
 - Contas individuais, papeis e trilha de auditoria por usuario ficam como evolucao posterior.
+
+## Estado atual do MVP - 2026-07-17
+
+### Implementado
+
+- Homepage publica responsiva com identidade oficial, estado institucional, jogo ao vivo, placar, cronometro continuo, historico, retrospecto, elenco e estatisticas, classico, quatro kits, local e CTA oficial do Instagram.
+- Agregacao publica consulta PostgreSQL pelo Supabase e recalcula placar/estatisticas a partir de eventos nao removidos e ajustes auditados.
+- Supabase Realtime assina `matches` e `match_events`; um gol publicado no admin atualiza a homepage aberta sem recarregamento manual.
+- Login real via Supabase Auth; `/admin` exige sessao e registro correspondente em `app_admins`.
+- Painel responsivo com navegacao lateral no desktop e barra inferior no celular.
+- Cadastro real de atletas, adversarios, rival principal, campos e partidas.
+- Ciclo da partida via RPC: agendada -> ao vivo -> encerrada. O banco impede duas partidas simultaneamente ao vivo e impede reabrir partida encerrada.
+- Console ao vivo grava gol do Unidos com autor/assistencia, gol do adversario e gol contra; remocao usa `deleted_at` e nunca apaga o evento.
+- Cronometro persistente, sem pausa ou tempos, continua alem de 60:00 ate o encerramento.
+- Edicao de bio, texto sobre o clube, localidade e Instagram.
+- Ajustes auditados de gols, assistencias, vitorias, empates e derrotas com valor e motivo.
+- Buckets publicos `players` e `opponents` preparados para imagens JPEG/PNG/WebP de ate 5 MB.
+- Runtime definido como Node.js 22 ou superior para compatibilidade com a versao atual do Supabase.
+
+### Validacao executada
+
+- `pnpm test`: 2 arquivos e 5 testes aprovados.
+- `pnpm db:test`: 37 testes pgTAP aprovados, incluindo schema, RLS e regras de ciclo da partida.
+- `pnpm typecheck`: aprovado.
+- `pnpm lint`: aprovado sem erros ou avisos.
+- `pnpm build`: build de producao aprovado.
+- Playwright: login, cadastro de atleta/adversario/campo/partida, inicio de jogo e publicacao de gol aprovados.
+- Playwright em duas abas: placar publico alterou de `1x0` para `1x1` por Realtime.
+- Viewports 390 px e 1440 px validados sem overflow horizontal, imagem quebrada ou erro de pagina.
+
+### Variaveis de ambiente
+
+Frontend e Vercel:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+Bootstrap da conta unica, usado apenas no terminal/CI seguro:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
+```
+
+Nunca expor `SUPABASE_SERVICE_ROLE_KEY` no navegador ou em variavel com prefixo `NEXT_PUBLIC_`.
+
+### Publicacao
+
+1. Criar ou escolher um projeto Supabase.
+2. Vincular o projeto com `supabase link --project-ref <ref>`.
+3. Aplicar o schema com `supabase db push`.
+4. Definir as quatro variaveis do bootstrap e executar `pnpm admin:create` uma vez.
+5. Cadastrar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` na Vercel.
+6. Importar o repositorio na Vercel usando Node.js 22 e executar o deploy.
+7. No primeiro acesso, cadastrar atletas, adversarios e campos reais; os nomes usados nos testes locais nao fazem parte da migration.
+
+### Limitacoes conhecidas para a proxima iteracao
+
+- Upload visual de foto do atleta e escudo do adversario ainda nao esta ligado aos formularios, embora Storage e politicas estejam prontos.
+- Correcao de gol no MVP e feita removendo logicamente o evento e publicando o correto; edicao direta do mesmo evento pode ser adicionada depois.
+- Cadastros permitem criar e arquivar atletas; edicao completa e arquivamento de adversarios/campos ainda podem ser ampliados.
+- Nao ha contas individuais nem atribuicao de alteracoes por pessoa, conforme a decisao de conta compartilhada.
