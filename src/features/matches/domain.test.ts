@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateClubRecord, calculatePlayerStats, calculateScore, formatMatchClock } from './domain'
+import { calculateClubRecord, calculatePlayerStats, calculateScore, formatMatchClock, resolveMatchScore } from './domain'
 import type { GoalEvent } from './types'
 
 const events: GoalEvent[] = [
@@ -16,6 +16,42 @@ describe('match domain', () => {
 
   it('ignores removed events when calculating the score', () => {
     expect(calculateScore(events)).toEqual({ unidos: 2, opponent: 1 })
+  })
+
+  it('uses the consolidated score for finished matches without events', () => {
+    expect(resolveMatchScore({
+      status: 'finished',
+      scoreUnidos: 4,
+      scoreOpponent: 2,
+      events: [],
+    })).toEqual({ unidos: 4, opponent: 2 })
+  })
+
+  it('uses events while the match is live', () => {
+    expect(resolveMatchScore({
+      status: 'live',
+      scoreUnidos: null,
+      scoreOpponent: null,
+      events,
+    })).toEqual({ unidos: 2, opponent: 1 })
+  })
+
+  it('resolves a scheduled match without score or events as nil-nil', () => {
+    expect(resolveMatchScore({
+      status: 'scheduled',
+      scoreUnidos: null,
+      scoreOpponent: null,
+      events: [],
+    })).toEqual({ unidos: 0, opponent: 0 })
+  })
+
+  it('does not count soft-deleted events when resolving a match score', () => {
+    expect(resolveMatchScore({
+      status: 'live',
+      scoreUnidos: null,
+      scoreOpponent: null,
+      events: [events[3]],
+    })).toEqual({ unidos: 0, opponent: 0 })
   })
 
   it('does not attribute own goals to players', () => {

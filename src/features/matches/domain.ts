@@ -1,4 +1,4 @@
-import type { ClubRecord, GoalEvent, PlayerStat, Score, StatAdjustment } from './types'
+import type { ClubRecord, GoalEvent, MatchScoreInput, PlayerStat, Score, StatAdjustment } from './types'
 
 export function formatMatchClock(startedAt: string, endedAt: string | null, now = new Date()) {
   const end = endedAt ? new Date(endedAt) : now
@@ -11,6 +11,17 @@ export function calculateScore(events: GoalEvent[]): Score {
     score[event.beneficiary] += 1
     return score
   }, { unidos: 0, opponent: 0 })
+}
+
+export function resolveMatchScore(input: MatchScoreInput): Score {
+  if (input.status === 'finished') {
+    return {
+      unidos: input.scoreUnidos ?? 0,
+      opponent: input.scoreOpponent ?? 0,
+    }
+  }
+
+  return calculateScore(input.events)
 }
 
 export function calculatePlayerStats(events: GoalEvent[], adjustments: StatAdjustment[]): PlayerStat[] {

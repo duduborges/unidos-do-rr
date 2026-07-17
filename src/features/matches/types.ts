@@ -11,6 +11,13 @@ export interface GoalEvent {
 }
 
 export interface Score { unidos: number; opponent: number }
+export type MatchStatus = 'scheduled' | 'live' | 'finished'
+export interface MatchScoreInput {
+  status: MatchStatus
+  scoreUnidos: number | null
+  scoreOpponent: number | null
+  events: GoalEvent[]
+}
 export interface ClubRecord { wins: number; draws: number; losses: number }
 export interface PlayerStat { playerId: string; goals: number; assists: number }
 export type StatMetric = 'goals' | 'assists' | 'wins' | 'draws' | 'losses'

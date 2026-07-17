@@ -1,5 +1,5 @@
-import { calculateClubRecord, calculatePlayerStats, calculateScore } from '@/features/matches/domain'
-import type { GoalEvent, StatAdjustment } from '@/features/matches/types'
+import { calculateClubRecord, calculatePlayerStats, resolveMatchScore } from '@/features/matches/domain'
+import type { GoalEvent, MatchStatus, StatAdjustment } from '@/features/matches/types'
 import { createClient } from '@/lib/supabase/server'
 import { emptyHomeData, type HomeData, type HomeMatch } from './demo-data'
 
@@ -21,15 +21,23 @@ export async function getHomeData(): Promise<HomeData> {
   if (failure?.error) throw new HomeDataError(failure.error.message)
 
   const rawEvents = eventsResult.data ?? []
-  const events: GoalEvent[] = rawEvents.map((event) => ({
-    id: event.id,
-    beneficiary: event.beneficiary === 'opponent' ? 'opponent' : 'unidos',
-    isOwnGoal: event.is_own_goal,
-    scorerPlayerId: event.scorer_player_id,
-    assistPlayerId: event.assist_player_id,
-    minute: event.minute_snapshot,
-    deletedAt: event.deleted_at,
-  }))
+  const events: GoalEvent[] = []
+  const eventsByMatchId = new Map<string, GoalEvent[]>()
+  for (const rawEvent of rawEvents) {
+    const event: GoalEvent = {
+      id: rawEvent.id,
+      beneficiary: rawEvent.beneficiary === 'opponent' ? 'opponent' : 'unidos',
+      isOwnGoal: rawEvent.is_own_goal,
+      scorerPlayerId: rawEvent.scorer_player_id,
+      assistPlayerId: rawEvent.assist_player_id,
+      minute: rawEvent.minute_snapshot,
+      deletedAt: rawEvent.deleted_at,
+    }
+    events.push(event)
+    const matchEvents = eventsByMatchId.get(rawEvent.match_id)
+    if (matchEvents) matchEvents.push(event)
+    else eventsByMatchId.set(rawEvent.match_id, [event])
+  }
   const adjustments: StatAdjustment[] = (adjustmentsResult.data ?? []).map((item) => ({
     scope: item.scope === 'club' ? 'club' : 'player',
     playerId: item.player_id,
@@ -40,7 +48,12 @@ export async function getHomeData(): Promise<HomeData> {
 
   const matchScores = new Map<string, { unidos: number; opponent: number }>()
   for (const match of matchesResult.data ?? []) {
-    matchScores.set(match.id, calculateScore(events.filter((event) => rawEvents.find((raw) => raw.id === event.id)?.match_id === match.id)))
+    matchScores.set(match.id, resolveMatchScore({
+      status: match.status as MatchStatus,
+      scoreUnidos: match.score_unidos,
+      scoreOpponent: match.score_opponent,
+      events: eventsByMatchId.get(match.id) ?? [],
+    }))
   }
 
   const finished = (matchesResult.data ?? []).filter((match) => match.status === 'finished')

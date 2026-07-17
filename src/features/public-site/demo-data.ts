@@ -9,7 +9,7 @@ export interface HomePlayer {
 }
 
 export interface HomeMatch {
-  id?: string
+  id: string
   date: string
   opponent: string
   field: string
@@ -60,10 +60,10 @@ export const demoData: HomeData = {
     { id: '6', name: 'Joao Pedro', nickname: 'JP', number: 11, position: 'Ala', goals: 2, assists: 2 },
   ],
   matches: [
-    { date: '12 JUL', opponent: 'Resenha FC', field: 'Arena Rio Vermelho', us: 4, them: 2, result: 'V' },
-    { date: '05 JUL', opponent: 'Muito Paia FC', field: 'Floripa Soccer', us: 2, them: 3, result: 'D' },
-    { date: '28 JUN', opponent: 'Real Norte', field: 'Arena Norte', us: 5, them: 1, result: 'V' },
-    { date: '21 JUN', opponent: 'Familia Fut7', field: 'Arena Rio Vermelho', us: 1, them: 2, result: 'D' },
+    { id: 'demo-resenha', date: '12 JUL', opponent: 'Resenha FC', field: 'Arena Rio Vermelho', us: 4, them: 2, result: 'V' },
+    { id: 'demo-muito-paia', date: '05 JUL', opponent: 'Muito Paia FC', field: 'Floripa Soccer', us: 2, them: 3, result: 'D' },
+    { id: 'demo-real-norte', date: '28 JUN', opponent: 'Real Norte', field: 'Arena Norte', us: 5, them: 1, result: 'V' },
+    { id: 'demo-familia-fut7', date: '21 JUN', opponent: 'Familia Fut7', field: 'Arena Rio Vermelho', us: 1, them: 2, result: 'D' },
   ],
   settings: {
     about: 'Do Rio Vermelho para o campo. Somos um time de Fut7 criado entre amigos, movido pela comunidade e pela vontade de competir. Em cada partida levamos o orgulho do norte da ilha.',
