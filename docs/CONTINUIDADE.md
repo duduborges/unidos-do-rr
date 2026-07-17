@@ -223,7 +223,7 @@ Nunca cadastrar `SUPABASE_SECRET_KEY`, `ADMIN_EMAIL` ou `ADMIN_PASSWORD` na Verc
 - Migrations `202607160001_initial_schema.sql` e `20260717052749_import_local_data.sql` aplicadas.
 - Snapshot local importado: 1 configuracao do clube, 6 atletas, 4 adversarios, 2 campos, 1 partida, 11 eventos e 4 ajustes estatisticos.
 - Contagens remotas verificadas pela Data API usando a chave publicavel.
-- Auth e `app_admins` nao foram copiados; a conta administrativa remota ainda precisa ser criada com `pnpm admin:create` e uma `SUPABASE_SECRET_KEY` usada somente em terminal seguro.
+- A conta `admin@unidosdorr.com.br` foi criada no Auth remoto, vinculada a `app_admins` e teve login real validado. A `SUPABASE_SECRET_KEY` foi usada somente em memoria pelo terminal e nao foi salva no projeto ou na Vercel.
 - O CLI 2.109.1 exibiu um aviso ao atualizar o cache experimental do `pg-delta` por ausencia do certificado temporario, mas as migrations foram aplicadas e verificadas normalmente.
 
 ### Limitacoes conhecidas para a proxima iteracao
